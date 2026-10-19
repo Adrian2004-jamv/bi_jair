@@ -47,6 +47,78 @@ const quizQuestions = [
   }
 ];
 
+const themeStorageKey = "bi-en-juego-theme";
+const dashboardCharts = [];
+
+function applyTheme(theme, persist = true) {
+  const isDark = theme === "dark";
+  const toggle = document.querySelector("#theme-toggle");
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
+  toggle.setAttribute("aria-pressed", String(isDark));
+  toggle.setAttribute("aria-label", isDark ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+  toggle.querySelector(".theme-icon").textContent = isDark ? "☀" : "☾";
+  document.querySelector("#theme-toggle-label").textContent = isDark ? "Tema claro" : "Tema oscuro";
+  document.querySelector('meta[name="theme-color"]').content = isDark ? "#141b17" : "#f6f4ee";
+
+  if (persist) {
+    try {
+      localStorage.setItem(themeStorageKey, theme);
+    } catch {
+      // El tema sigue funcionando aunque el navegador bloquee el almacenamiento local.
+    }
+  }
+
+  updateDashboardChartTheme();
+}
+
+function initializeThemeToggle() {
+  let savedTheme = "light";
+  try {
+    savedTheme = localStorage.getItem(themeStorageKey) || "light";
+  } catch {
+    savedTheme = "light";
+  }
+
+  applyTheme(savedTheme === "dark" ? "dark" : "light", false);
+  document.querySelector("#theme-toggle").addEventListener("click", () => {
+    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    applyTheme(nextTheme);
+  });
+}
+
+function updateDashboardChartTheme() {
+  const isDark = document.documentElement.dataset.theme === "dark";
+  const textColor = isDark ? "#d1ddd3" : "#68746c";
+  const gridColor = isDark ? "#39463d" : "#e9ece5";
+  const panelColor = isDark ? "#202a24" : "#fffefa";
+  const leadColor = isDark ? "#a8cf7b" : "#174d3c";
+
+  if (typeof Chart !== "undefined") Chart.defaults.color = textColor;
+
+  dashboardCharts.forEach((chart) => {
+    chart.options.color = textColor;
+    Object.values(chart.options.scales || {}).forEach((scale) => {
+      if (scale.ticks) scale.ticks.color = textColor;
+      if (scale.grid && scale.grid.display !== false) scale.grid.color = gridColor;
+      if (scale.title) scale.title.color = textColor;
+    });
+    const legend = chart.options.plugins?.legend;
+    if (legend?.labels) legend.labels.color = textColor;
+
+    if (chart.config.type === "bar") {
+      chart.data.datasets[0].backgroundColor = teams.map((_, index) => index === 0 ? leadColor : (isDark ? "#587763" : "#aec8b8"));
+    } else if (chart.config.type === "doughnut") {
+      chart.data.datasets[0].borderColor = panelColor;
+    } else if (chart.config.type === "line") {
+      chart.data.datasets[0].borderColor = leadColor;
+      chart.data.datasets[0].pointBorderColor = panelColor;
+    }
+
+    chart.update("none");
+  });
+}
+
 // Estado y renderizado del cuestionario.
 const quizState = { questionIndex: 0, score: 0, selectedChoice: null, checked: false };
 const quizElements = {
@@ -235,6 +307,47 @@ function renderStandings() {
   });
 }
 
+function downloadReport() {
+  const averageAttendance = Math.round(teams.reduce((sum, team) => sum + team.attendance, 0) / teams.length);
+  const rows = [
+    ["Reporte Liga Pro Ecuador 2026 (datos simulados)"],
+    ["Fecha de descarga", new Date().toLocaleString("es-EC")],
+    [],
+    ["Resumen", "Valor", "Detalle"],
+    ["Líder del campeonato", teams[0].name, `${teams[0].points} puntos`],
+    ["Goleador del torneo", "J. Cazares", "8 goles · Independiente del Valle"],
+    ["Asistencia promedio", averageAttendance, "espectadores por club"],
+    ["Próximo partido", "Barcelona SC vs. Emelec", "Jornada 10 · Clásico del Astillero"],
+    [],
+    ["Posición", "Equipo", "PJ", "G", "E", "P", "GF", "GC", "DG", "Puntos", "Asistencia media"],
+    ...teams.map((team, index) => [
+      index + 1,
+      team.name,
+      team.played,
+      team.wins,
+      team.draws,
+      team.losses,
+      team.goalsFor,
+      team.goalsAgainst,
+      team.goalsFor - team.goalsAgainst,
+      team.points,
+      team.attendance
+    ])
+  ];
+  const csv = `\uFEFF${rows.map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\r\n")}`;
+  const file = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(file);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "liga-pro-ecuador-2026-reporte.csv";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+document.querySelector("#download-report").addEventListener("click", downloadReport);
+
 let positionChart;
 
 // Inicializa Chart.js y conecta el selector a la evolución de posiciones.
@@ -255,11 +368,11 @@ function renderCharts() {
   }
 
   Chart.defaults.font.family = '"DM Sans", sans-serif';
-  Chart.defaults.color = "#68746c";
-  const gridColor = "#e9ece5";
+  Chart.defaults.color = document.documentElement.dataset.theme === "dark" ? "#d1ddd3" : "#68746c";
+  const gridColor = document.documentElement.dataset.theme === "dark" ? "#39463d" : "#e9ece5";
   const palette = ["#174d3c", "#f07859", "#b9d84f", "#78a8a1", "#e6aa49", "#8a7d68"];
 
-  new Chart(document.querySelector("#goals-chart"), {
+  const goalsChart = new Chart(document.querySelector("#goals-chart"), {
     type: "bar",
     data: {
       labels: teams.map((team) => team.short),
@@ -279,11 +392,12 @@ function renderCharts() {
       }
     }
   });
+  dashboardCharts.push(goalsChart);
 
   const topFivePoints = teams.slice(0, 5).map((team) => team.points);
   const remainingPoints = teams.slice(5).reduce((sum, team) => sum + team.points, 0);
   const pointsTotal = teams.reduce((sum, team) => sum + team.points, 0);
-  new Chart(document.querySelector("#points-chart"), {
+  const pointsChart = new Chart(document.querySelector("#points-chart"), {
     type: "doughnut",
     data: {
       labels: [...teams.slice(0, 5).map((team) => team.name), "Resto de equipos"],
@@ -298,6 +412,7 @@ function renderCharts() {
       }
     }
   });
+  dashboardCharts.push(pointsChart);
 
   positionChart = new Chart(document.querySelector("#position-chart"), {
     type: "line",
@@ -315,6 +430,7 @@ function renderCharts() {
       }
     }
   });
+  dashboardCharts.push(positionChart);
 
   selector.addEventListener("change", () => {
     const selected = teams.find((team) => team.short === selector.value);
@@ -324,13 +440,14 @@ function renderCharts() {
 }
 
 function createPositionDataset(team) {
+  const isDark = document.documentElement.dataset.theme === "dark";
   return {
     label: team.name,
     data: team.positions,
-    borderColor: "#174d3c",
+    borderColor: isDark ? "#a8cf7b" : "#174d3c",
     backgroundColor: "rgba(23, 77, 60, .12)",
     pointBackgroundColor: "#f07859",
-    pointBorderColor: "#fffefa",
+    pointBorderColor: isDark ? "#202a24" : "#fffefa",
     pointBorderWidth: 2,
     pointRadius: 4,
     pointHoverRadius: 6,
@@ -343,4 +460,5 @@ function createPositionDataset(team) {
 renderQuizQuestion();
 renderSummaryCards();
 renderStandings();
+initializeThemeToggle();
 renderCharts();
