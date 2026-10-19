@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f6f4ee">
+	<meta name="description" content="Sílabo de Sistemas de Información para la Inteligencia de Negocios, UTC Latacunga.">
+	<title>Sílabo | BI en juego</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="css/styles.css">
+	<link rel="stylesheet" href="css/silabo.css">
+</head>
+<body class="silabo-page">
+	<header class="site-header">
+		<nav class="navbar navbar-expand-lg" aria-label="Navegación principal">
+			<div class="container site-container">
+				<a class="navbar-brand brand-mark" href="index.html#inicio" aria-label="BI en juego, inicio"><span class="brand-icon" aria-hidden="true">B</span> BI <span>en juego</span></a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Abrir navegación"><span class="navbar-toggler-icon"></span></button>
+				<div class="collapse navbar-collapse" id="mainNavigation">
+					<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+						<li class="nav-item"><a class="nav-link" href="index.html#fundamentos">01 <span>Fundamentos</span></a></li>
+						<li class="nav-item"><a class="nav-link" href="index.html#quiz">02 <span>Quiz</span></a></li>
+						<li class="nav-item"><a class="nav-link" href="index.html#dashboard">03 <span>Dashboard</span></a></li>
+						<li class="nav-item theme-nav-item"><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Cambiar a tema oscuro" aria-pressed="false"><span class="theme-icon" aria-hidden="true">☾</span><span id="theme-toggle-label">Tema oscuro</span></button></li>
+						<li class="nav-item nav-cta"><a class="nav-link" href="#unidades">Unidades <span aria-hidden="true">↗</span></a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	</header>
+
+	<main>
+		<section class="silabo-hero" aria-labelledby="silabo-title">
+			<div class="container site-container silabo-hero-grid">
+				<div>
+					<p class="eyebrow"><span class="status-dot"></span> Plan académico · <span id="academic-year"></span></p>
+					<p class="silabo-overline">SÍLABO DE ASIGNATURA</p>
+					<h1 id="silabo-title"></h1>
+					<p class="silabo-institution" id="institution-line"></p>
+				</div>
+				<div class="silabo-hero-mark" aria-hidden="true"><span>BI</span><i class="bi bi-diagram-3"></i><small>INFORMACIÓN<br>EN ACCIÓN</small></div>
+			</div>
+		</section>
+
+		<section class="silabo-section course-section" aria-labelledby="course-facts-title">
+			<div class="container site-container">
+				<div class="section-heading silabo-section-heading">
+					<div><p class="eyebrow section-kicker">La asignatura</p><h2 id="course-facts-title">Una ficha, <span>todo el contexto.</span></h2></div>
+					<p class="section-intro">Organización, carga académica y acompañamiento docente en un solo vistazo.</p>
+				</div>
+				<div class="silabo-kpi-grid" id="course-kpis" aria-label="Datos clave de la asignatura"></div>
+				<div class="course-facts-strip" id="course-facts"></div>
+			</div>
+		</section>
+
+		<section class="silabo-section overview-section" aria-labelledby="overview-title">
+			<div class="container site-container">
+				<div class="overview-heading"><p class="eyebrow section-kicker">Sentido formativo</p><h2 id="overview-title">Del dato a una <span>decisión con sentido.</span></h2></div>
+				<div class="overview-grid" id="overview-cards"></div>
+			</div>
+		</section>
+
+		<section class="silabo-section units-section" id="unidades" aria-labelledby="units-title">
+			<div class="container site-container">
+				<div class="section-heading silabo-section-heading">
+					<div><p class="eyebrow section-kicker">Ruta de aprendizaje</p><h2 id="units-title">Tres unidades, <span>una práctica.</span></h2></div>
+					<p class="section-intro">Explora cada etapa, sus actividades y la forma en que se valorará el aprendizaje.</p>
+				</div>
+				<div class="unit-switcher nav nav-tabs" id="unit-tabs" role="tablist" aria-label="Unidades de aprendizaje"></div>
+				<div class="tab-content unit-content" id="unit-tab-content"></div>
+			</div>
+		</section>
+
+		<section class="silabo-section hours-section" aria-labelledby="hours-title">
+			<div class="container site-container">
+				<div class="section-heading silabo-section-heading">
+					<div><p class="eyebrow section-kicker">Dedicación académica</p><h2 id="hours-title">El tiempo también <span>enseña.</span></h2></div>
+					<p class="section-intro" id="hours-description"></p>
+				</div>
+				<div class="hours-grid">
+					<article class="hours-panel"><div class="hours-panel-heading"><div><span class="chart-index">01 / POR UNIDAD</span><h3>Horas por componente</h3></div><span class="hours-total" id="hours-total"></span></div><div class="silabo-chart silabo-chart-bars"><canvas id="unit-hours-chart" role="img" aria-label="Horas apiladas de docencia, prácticas y trabajo autónomo por unidad"></canvas></div><div class="hours-legend" id="unit-hours-legend"></div></article>
+					<article class="hours-panel hours-donut-panel"><div class="hours-panel-heading"><div><span class="chart-index">02 / TOTAL</span><h3>Distribución global</h3></div><span class="chart-unit" id="hours-chart-total"></span></div><div class="silabo-chart silabo-chart-donut"><canvas id="total-hours-chart" role="img" aria-label="Gráfico de dona con la distribución total de horas"></canvas><div class="donut-center"><strong id="hours-donut-total"></strong><span>HORAS</span></div></div><div class="hours-legend hours-legend-total" id="total-hours-legend"></div></article>
+				</div>
+			</div>
+		</section>
+
+		<section class="silabo-section evaluations-section" aria-labelledby="evaluations-title">
+			<div class="container site-container">
+				<div class="section-heading silabo-section-heading">
+					<div><p class="eyebrow section-kicker">Hitos del período</p><h2 id="evaluations-title">Fechas para <span>tener a la vista.</span></h2></div>
+					<p class="section-intro">Cuenta regresiva calculada automáticamente según la fecha local de tu navegador.</p>
+				</div>
+				<div class="evaluation-timeline" id="evaluation-timeline" aria-label="Calendario de evaluaciones"></div>
+			</div>
+		</section>
+
+		<section class="silabo-section skills-section" aria-labelledby="skills-title">
+			<div class="container site-container">
+				<div class="section-heading silabo-section-heading">
+					<div><p class="eyebrow section-kicker">Aprender también es crecer</p><h2 id="skills-title">Habilidades para <span>trabajar mejor.</span></h2></div>
+					<p class="section-intro">Capacidades personales que se ponen en juego al analizar datos y colaborar.</p>
+				</div>
+				<div class="soft-skills-grid" id="soft-skills"></div>
+			</div>
+		</section>
+
+		<section class="project-section" aria-labelledby="project-title">
+			<div class="container site-container">
+				<div class="project-card" id="project-card"></div>
+			</div>
+		</section>
+
+		<section class="silabo-section bibliography-section" aria-labelledby="bibliography-title">
+			<div class="container site-container">
+				<div class="section-heading silabo-section-heading">
+					<div><p class="eyebrow section-kicker">Lecturas y herramientas</p><h2 id="bibliography-title">Seguir la pista <span>al conocimiento.</span></h2></div>
+					<p class="section-intro">Bibliografía y recursos para profundizar en los temas de cada unidad.</p>
+				</div>
+				<div class="bibliography-grid" id="bibliography-list"></div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="site-footer"><div class="container site-container footer-inner"><a class="navbar-brand brand-mark" href="index.html#inicio"><span class="brand-icon" aria-hidden="true">B</span> BI <span>en juego</span></a><p>Fundamentos de Business Intelligence <span>·</span> Material educativo</p><a href="#silabo-title" class="back-top">Volver arriba ↑</a></div></footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+	<script src="js/silabo.js" defer></script>
+</body>
+</html>
